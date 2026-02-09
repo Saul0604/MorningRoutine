@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Rutina Matutina</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #2d6a4f;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .routine-item {
+            background: #f1faee;
+            border-left: 5px solid #2d6a4f;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .routine-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(45, 106, 79, 0.2);
+        }
+        
+        .routine-item.completed {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+            opacity: 0.7;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .item-time {
+            font-weight: bold;
+            color: #2d6a4f;
+            font-size: 1.1em;
+        }
+        
+        .item-duration {
+            background: #52b788;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .item-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .item-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #2d6a4f;
+        }
+        
+        .progress-container {
+            background: #f0f0f0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2d6a4f 0%, #52b788 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .benefits {
+            background: #fff9e6;
+            border: 2px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .benefits h3 {
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+        
+        .benefits ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .benefits li {
+            padding: 8px 0;
+            color: #666;
+        }
+        
+        .benefits li:before {
+            content: "✨ ";
+            margin-right: 10px;
+        }
+        
+        .timer-display {
+            text-align: center;
+            font-size: 3em;
+            color: #2d6a4f;
+            margin: 20px 0;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: #2d6a4f;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #52b788;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 106, 79, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .current-activity {
+            background: #d8f3dc;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #1b4332;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌅 Mi Rutina Matutina</h1>
+        <p class="subtitle">Empieza tu día con energía y propósito</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+        
+        <div id="currentActivity" class="current-activity" style="display: none;">
+            Actividad actual: <span id="activityName"></span>
+        </div>
+        
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        
+        <div class="timer-controls">
+            <button class="btn" id="startBtn" onclick="startTimer()">▶️ Iniciar</button>
+            <button class="btn" id="pauseBtn" onclick="pauseTimer()" disabled>⏸️ Pausar</button>
+            <button class="btn" id="resetBtn" onclick="resetTimer()">🔄 Reiniciar</button>
+        </div>
+        
+        <div id="routineList">
+            <!-- Routine items will be inserted here -->
+        </div>
+        
+        <div class="benefits">
+            <h3>💪 Beneficios de tu rutina:</h3>
+            <ul>
+                <li>Mejora tu flexibilidad y previene dolores musculares</li>
+                <li>Reduce el estrés y aumenta tu claridad mental</li>
+                <li>Activa tu metabolismo desde temprano</li>
+                <li>Desarrolla hábitos de lectura consistentes</li>
+                <li>Comienza el día con intención y enfoque</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const routine = [
+            {
+                time: "7:00",
+                duration: 5,
+                title: "Despertar y Hidratación",
+                description: "Levántate, abre las cortinas y toma un vaso grande de agua. Esto activa tu metabolismo y te ayuda a despertar."
+            },
+            {
+                time: "7:05",
+                duration: 10,
+                title: "Meditación Mindfulness",
+                description: "Siéntate cómodamente, cierra los ojos y enfócate en tu respiración. Deja pasar los pensamientos sin juzgarlos. Apps recomendadas: Insight Timer, Headspace."
+            },
+            {
+                time: "7:15",
+                duration: 20,
+                title: "Yoga/Estiramientos",
+                description: "Rutina suave de yoga enfocada en flexibilidad: saludo al sol, postura del gato-vaca, perro mirando abajo, estiramiento de isquiotibiales. YouTube: 'Yoga with Adriene' tiene excelentes rutinas de 20 minutos."
+            },
+            {
+                time: "7:35",
+                duration: 15,
+                title: "Lectura Inspiradora",
+                description: "Lee 10-15 páginas de un libro que te inspire o te haga crecer (desarrollo personal, filosofía, biografías). Mantén el libro en tu mesita de noche."
+            },
+            {
+                time: "7:50",
+                duration: 15,
+                title: "Ejercicio",
+                description: "Entrenamiento personalizado."
+            }
+        ];
+        
+        let completedItems = new Set();
+        let timerInterval = null;
+        let currentSeconds = 0;
+        let isPaused = false;
+        let currentActivityIndex = -1;
+        
+        function renderRoutine() {
+            const routineList = document.getElementById('routineList');
+            routineList.innerHTML = '';
+            
+            routine.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `routine-item ${completedItems.has(index) ? 'completed' : ''}`;
+                div.innerHTML = `
+                    <div class="item-header">
+                        <div style="display: flex; align-items: center;">
+                            <input type="checkbox" class="checkbox" ${completedItems.has(index) ? 'checked' : ''} 
+                                   onchange="toggleComplete(${index})">
+                            <span class="item-time">${item.time}</span>
+                        </div>
+                        <span class="item-duration">${item.duration} min</span>
+                    </div>
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-description">${item.description}</div>
+                `;
+                routineList.appendChild(div);
+            });
+            
+            updateProgress();
+        }
+        
+        function toggleComplete(index) {
+            if (completedItems.has(index)) {
+                completedItems.delete(index);
+            } else {
+                completedItems.add(index);
+            }
+            renderRoutine();
+        }
+        
+        function updateProgress() {
+            const progress = (completedItems.size / routine.length) * 100;
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+        }
+        
+        function startTimer() {
+            if (currentActivityIndex === -1) {
+                currentActivityIndex = 0;
+            }
+            
+            isPaused = false;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('currentActivity').style.display = 'block';
+            document.getElementById('activityName').textContent = routine[currentActivityIndex].title;
+            
+            timerInterval = setInterval(() => {
+                currentSeconds++;
+                updateTimerDisplay();
+                
+                const currentDuration = routine[currentActivityIndex].duration * 60;
+                if (currentSeconds >= currentDuration) {
+                    completedItems.add(currentActivityIndex);
+                    renderRoutine();
+                    
+                    currentActivityIndex++;
+                    if (currentActivityIndex >= routine.length) {
+                        resetTimer();
+                        alert('¡Felicidades! Has completado tu rutina matutina 🎉');
+                        return;
+                    }
+                    
+                    currentSeconds = 0;
+                    document.getElementById('activityName').textContent = routine[currentActivityIndex].title;
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            isPaused = true;
+            clearInterval(timerInterval);
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+        }
+        
+        function resetTimer() {
+            clearInterval(timerInterval);
+            currentSeconds = 0;
+            currentActivityIndex = -1;
+            isPaused = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('currentActivity').style.display = 'none';
+            updateTimerDisplay();
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(currentSeconds / 60);
+            const seconds = currentSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        // Initialize
+        renderRoutine();
+    </script>
+</body>
+</html>
